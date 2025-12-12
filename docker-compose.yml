@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pulso_logis_db
+    restart: always
+    environment:
+      POSTGRES_USER: ihan_clogis
+      POSTGRES_PASSWORD: contraseñaultrasegura
+      POSTGRES_DB: pulso_logis_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: pulso_logis_web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://ihan_clogis:contraseñaultrasegura@db:5432/pulso_logis_db
+      AUTH_SECRET: "gmpMvZRaIdiuTU5bogaDPHsw3dLW3zizcmzKG1dqesrF"
+      AUTH_TRUST_HOST: "true"
+      AUTH_URL: "http://localhost:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - db
+    
+volumes:
+  postgres_data:

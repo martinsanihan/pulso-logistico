@@ -1,0 +1,86 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Producto {
+  id           String   @id @default(uuid())
+  nombre       String
+  precio       Int
+  desc         String?
+  categoria    String?
+  subcategoria String?
+  stock        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@map("productos")
+}
+
+model Auspiciador {
+  id        String   @id @default(uuid())
+  nombre    String
+  logo      String?
+  tipo      String?
+  desc      String?
+  web       String?
+  createdAt DateTime @default(now())
+
+  @@map("auspiciadores")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?   // Nombre completo
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   // Avatar o Foto
+  
+  // -- TUS CAMPOS PERSONALIZADOS --
+  password      String?   // Contraseña encriptada (Opcional por si entra con Google)
+  role          String    @default("user") // 'admin' o 'user'
+  status        String    @default("pendiente") // 'pendiente', 'aprobado'
+  username      String?   // Tu campo de usuario personalizado
+  // ------------------------------
+
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users") // Nombre estándar en DB
+}
+
+model Account {
+  id                 String  @id @default(uuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? 
+  access_token       String? 
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
