@@ -44,7 +44,7 @@ export default async function Home() {
         {auspiciadores.map((ausp) => (
           <div key={ausp.id} className="relative h-16 w-32 flex items-center justify-between p-2">
             {ausp.logo ? (
-              <Link href={ausp.web || 'www.google.com'} className="relative h-16 w-32">
+              <Link href={'https://'+ausp.web || 'https://www.google.com'} className="relative h-16 w-32">
                 <img
                   src={ausp.logo}
                   alt={ausp.nombre}
