@@ -20,7 +20,7 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://ihan_clogis:contraseñaultrasegura@db:5432/pulso_logis_db
-      # AUTH_SECRET: "gmpMvZRaIdiuTU5bogaDPHsw3dLW3zizcmzKG1dqesrF"
+      AUTH_SECRET: "vOzAvtTsvwIBH67wfKdmwt1l6ISX/kMkUzUoQPVonYA="
       # AUTH_TRUST_HOST: "true"
       # AUTH_URL: "http://localhost:3000"
     volumes:

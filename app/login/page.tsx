@@ -1,15 +1,19 @@
 'use client';
 
-// import { login } from './actions'
 import Link from 'next/link'
-import { useActionState } from 'react';
-// import { authenticate } from '@/app/lib/actions';
+import { useActionState } from 'react'
+import { authenticate } from '@/app/lib/actions'
+import { useSearchParams } from 'next/navigation'
 
 export default function Login() {
-    // const [errorMessage, formAction, isPending] = useActionState(
-    //     authenticate,
-    //     undefined
-    // )
+    const searchParams = useSearchParams()
+    const callbackUrl = searchParams.get('callbackUrl') || '/'
+    const [errorMessage, formAction, isPending] = useActionState(
+        authenticate,
+        undefined
+    )
+
+
 
     return (
         <div className='flex min-h-screen items-center justify-center bg-gray-50 p-4'>
@@ -21,7 +25,7 @@ export default function Login() {
                     </p>
                 </div>
 
-                <form className='mt-8 space-y-4'>
+                <form className='mt-8 space-y-4' action={formAction}>
                     <div className='space-y-4 rounded-md shadow-sm'>
                         <label htmlFor='email' className='sr-only'>E-mail</label>
                         <input
@@ -53,15 +57,15 @@ export default function Login() {
                         />
                     </div>
 
-                    {/* {errorMessage && (
-                        <div className='rounded-md bg-red-50 p-4'>
+                    {errorMessage && (
+                        <div className='rounded-md bg-transparent p-4'>
                             <div className='flex'>
                                 <div className='text-sm text-red-700 font-medium'>
                                     {errorMessage}
                                 </div>
                             </div>
                         </div>
-                    )} */}
+                    )}
 
                     <Link href='/login/signup'>
                         <div className='text-center mt-4 mb-4'>
@@ -70,15 +74,16 @@ export default function Login() {
                     </Link>
 
                     <div className='flex gap-4'>
+                        <input type="hidden" name="redirectTo" value={callbackUrl} />
                         <button
                             type='submit'
                             // disabled={isPending}
                             // formAction={login}
                             className='group relative flex w-full justify-center rounded-md border border-transparent
-                            bg-blue-600 px-4 py-2 text-sm font-medium text-white bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
+                            px-4 py-2 text-sm font-medium text-white bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
                             focus:ring-offset-2'
                         >
-                            {/* {isPending ? 'Ingresando...' : 'Iniciar Sesión'} */}
+                            Iniciar Sesión
                         </button>
                     </div>
                     

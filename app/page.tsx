@@ -2,10 +2,14 @@ import Link from "next/link"
 import Hero from "./components/Hero"
 import ProductCard from "./components/ProductCard"
 import { prisma } from "@/lib/prisma"
+import { auth } from '@/auth'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
+  const session = await auth()
+  console.log("estado de la sesión", session)
+
   const productos = await prisma.producto.findMany()
   const auspiciadores = await prisma.auspiciador.findMany();
 
