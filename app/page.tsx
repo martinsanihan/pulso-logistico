@@ -7,10 +7,10 @@ import { auth } from '@/auth'
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const session = await auth()
-  console.log("estado de la sesión", session)
+  const session = await auth();
+  console.log("estado de la sesión", session);
 
-  const productos = await prisma.producto.findMany()
+  const productos = await prisma.producto.findMany();
   const auspiciadores = await prisma.auspiciador.findMany();
 
   console.log(productos, auspiciadores)

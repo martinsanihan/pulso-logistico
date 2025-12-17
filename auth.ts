@@ -1,23 +1,26 @@
-import NextAuth from 'next-auth'
 import { authConfig } from './auth.config'
-import Credetenials from 'next-auth/providers/credentials'
+import Credentials from 'next-auth/providers/credentials'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import type { User } from '@/app/lib/definitions'
+import NextAuth, { CredentialsSignin } from 'next-auth'
 
 const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6)
 })
 
+class pendingAccountErr extends CredentialsSignin {
+    code = "Cuenta pendiente de aprobación.";
+}
+
 export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
     adapter: PrismaAdapter(prisma),
     session: { strategy: 'jwt' },
     providers: [
-        Credetenials({
+        Credentials({
             async authorize(credentials) {
                 const parsedCredentials = loginSchema.safeParse(credentials)
 
@@ -30,6 +33,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                     const passwordMatch = await bcrypt.compare(password, user.password)
 
                     if (passwordMatch) {
+                        if (user.status !== "aprobado") {
+                            throw new pendingAccountErr();
+                        }
+
                         const { password: _password, ...userWithoutPass } = user
                         return userWithoutPass
                     }

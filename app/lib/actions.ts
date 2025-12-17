@@ -7,19 +7,21 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { userAgent } from 'next/server'
+import { routeModule } from 'next/dist/build/templates/pages'
 
 export async function authenticate(
     prevState: String | undefined,
     formData: FormData
 ) {
     try {
-        await signIn('credentials', formData, { redirect: false })
+        await signIn('credentials', formData, { redirect: false });
 
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
-                case 'CredentialsSignIn':
-                    return 'Credenciales Invalidas.'
+                case 'CredentialsSignin':
+                    return error.code || 'Credenciales Invalidas'
                 default:
                     return 'Algo Salió Mal'
             }
@@ -27,7 +29,18 @@ export async function authenticate(
         throw error
     }
 
-    redirect('/')
+    const session = await auth();
+    const user = await prisma.user.findUnique({
+        where: { id: session?.user?.id },
+        select: { role: true }
+    })
+
+    if (user?.role === 'admin') {
+        redirect('/admin')
+    }
+    else if (user?.role === 'user') {
+        redirect('/perfil')
+    }
 }
 
 const profileSchema = z.object({
@@ -121,5 +134,50 @@ export async function signUp(
         return "Error al registrar usuario."
     }
 
-    redirect('/perfil');
+    // redirect('/perfil');
+
+    redirect('/login?success=account-created')
+}
+
+export async function updateUserStatus(userId: string, newStatus: string) {
+  const session = await auth();
+  const user = await prisma.user.findUnique({
+    where: { id: session?.user?.id },
+    select: { role: true }
+  })
+  
+  if (user?.role !== 'admin') {
+    throw new Error("No autorizado");
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { status: newStatus },
+    });
+    
+    revalidatePath('/admin/users');
+    return { success: true };
+  } catch (error) {
+    return { error: "No se pudo actualizar el estado" };
+  }
+}
+
+export async function deleteUser(userId: String) {
+    const session = await auth();
+    // const user = await prisma.user.findUnique({
+    //     where: { id: userId },
+    //     select: { id: true }
+    // });
+
+    try {
+        await prisma.user.delete({
+            where: { id: userId }
+        });
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error) {
+        console.error("error al eliminar usuario", error);
+        return { error: "No se pudo eliminar el usuario, intentelo de nuevo." }
+    }
 }
