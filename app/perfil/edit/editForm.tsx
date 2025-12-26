@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { updateProfile } from "@/app/lib/actions";
+import Link from "next/link";
 
 export default function EditForm({user}: {user:any}) {
     const [errorMessage, formAction, isPending] = useActionState(
@@ -58,6 +59,13 @@ export default function EditForm({user}: {user:any}) {
             )}
 
             <div className="flex gap-4">
+                <Link href="/perfil">
+                    <span className="group relative flex w-full justify-center rounded-md border border-transparent
+                    px-4 py-2 text-sm font-medium text-white bg-black focus:outline-none focus:ring-2 focus:ring-blue-500
+                    focus:ring-offset-2">
+                        Cancelar
+                    </span>
+                </Link>
                 <button
                     type="submit"
                     className='group relative flex w-full justify-center rounded-md border border-transparent

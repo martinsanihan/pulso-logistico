@@ -14,9 +14,11 @@ model Producto {
   precio       Int
   desc         String?
   categoria    String?
-  subcategoria String?
-  stock        Int      @default(0)
+  archivo      String
   createdAt    DateTime @default(now())
+  activo       Boolean  @default(true)
+
+  compras Compra[]
 
   @@map("productos")
 }
@@ -35,39 +37,41 @@ model Auspiciador {
 
 model User {
   id            String    @id @default(uuid())
-  name          String?   // Nombre completo
+  name          String? // Nombre completo
   email         String?   @unique
   emailVerified DateTime?
-  image         String?   // Avatar o Foto
-  
+  image         String? // Avatar o Foto
+
+  compras Compra[]
+
   // -- TUS CAMPOS PERSONALIZADOS --
-  password      String?   // Contraseña encriptada (Opcional por si entra con Google)
-  role          String    @default("user") // 'admin' o 'user'
-  status        String    @default("pendiente") // 'pendiente', 'aprobado'
-  username      String?   // Tu campo de usuario personalizado
+  password String? // Contraseña encriptada (Opcional por si entra con Google)
+  role     String  @default("user") // 'admin' o 'user'
+  status   String  @default("pendiente") // 'pendiente', 'aprobado'
+  username String? // Tu campo de usuario personalizado
   // ------------------------------
 
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  accounts  Account[]
+  sessions  Session[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("users") // Nombre estándar en DB
 }
 
 model Account {
-  id                 String  @id @default(uuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? 
-  access_token       String? 
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -83,4 +87,29 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model Compra {
+  id           String   @id @default(uuid())
+  userId       String
+  productoId   String
+  precioPagado Int
+  createdAt    DateTime @default(now())
+
+  // Relaciones
+  user     User     @relation(fields: [userId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@map("compras")
+}
+
+
+model VerificationToken {
+  id      String   @id @default(uuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+  @@map("verification_tokens")
 }

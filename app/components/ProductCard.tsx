@@ -1,15 +1,16 @@
 import Link from 'next/link';
 
 interface ProductProps {
-    nombre: String,
-    descripcion: String
-    categoria: String,
-    subcategoria: String,
+    id: string,
+    nombre: string,
+    descripcion: string
+    categoria: string,
+    subcategoria: string,
     precio: number,
     stock: number
 }
 
-export default function ProductCard({ nombre, descripcion, categoria, subcategoria, precio, stock }: ProductProps) {
+export default function ProductCard({ id, nombre, descripcion, categoria, subcategoria, precio, stock }: ProductProps) {
     return (
         <div className='border rounded p-4 hover:shadow-lg transition-shadow bg-white border-gray-300'>
             <span className='text-xs uppercase text-black font-bold'>
@@ -29,9 +30,11 @@ export default function ProductCard({ nombre, descripcion, categoria, subcategor
                 <span className='text-lg font-bold text-blue-600'>
                     ${precio}
                 </span>
-                <button className='bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700'>
-                    Ver
-                </button>
+                <Link href={`/producto?pid=${id}`}>
+                    <button className='bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700'>
+                        Ver
+                    </button>
+                </Link>
             </div>
             <span className='text-s text-gray-500'>
                 Stock: {stock}

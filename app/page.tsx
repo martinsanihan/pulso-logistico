@@ -10,7 +10,9 @@ export default async function Home() {
   const session = await auth();
   console.log("estado de la sesión", session);
 
-  const productos = await prisma.producto.findMany();
+  const productos = await prisma.producto.findMany({
+    take:8
+  });
   const auspiciadores = await prisma.auspiciador.findMany();
 
   console.log(productos, auspiciadores)
@@ -19,16 +21,17 @@ export default async function Home() {
     <main className="min-h-screen bg-gray-50 pb-20">
       <Hero />
 
-      <div className="max-w-7xl mx-auto px-6 mt-12">
+      <div className="max-w-7xl mx-auto px-6 mt-12 p-5">
         <div className="flex justify-between items-end mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Artículos</h2>
           <span className="text-sm text-gray-500">Mostrando {productos.length} resultados</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
           {productos.map((prod) => (
             <ProductCard
               key={prod.id}
+              id={prod.id}
               nombre={prod.nombre}
               descripcion={prod.desc || "sin descripción"}
               categoria={prod.categoria || "sin categoria"}
@@ -37,6 +40,14 @@ export default async function Home() {
               stock={prod.stock}
             />
           ))}
+        </div>
+
+        <div className="items-center justify-center py-5 flex">
+          <Link href="/productos">
+            <span className="bg-blue-700 py-3 px-7 text-white rounded-md hover:bg-blue-800">
+              Ver Más
+            </span>
+          </Link>
         </div>
       </div>
 
@@ -48,7 +59,7 @@ export default async function Home() {
         {auspiciadores.map((ausp) => (
           <div key={ausp.id} className="relative h-16 w-32 flex items-center justify-between p-2">
             {ausp.logo ? (
-              <Link href={'https://'+ausp.web || 'https://www.google.com'} className="relative h-16 w-32">
+              <Link href={`https://${ausp.web}` || 'https://www.google.com'} className="relative h-16 w-32">
                 <img
                   src={ausp.logo}
                   alt={ausp.nombre}
