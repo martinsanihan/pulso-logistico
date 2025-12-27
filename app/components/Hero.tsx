@@ -10,7 +10,7 @@ export default function Hero() {
                 <p className='py-4 mb-8'>
                     Una Iniciativa de Conecta Logística
                 </p>
-                <Link href="/catalogo"
+                <Link href="/productos"
                 className='bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors'>
                     Ver Productos
                 </Link>

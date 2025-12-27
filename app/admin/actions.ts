@@ -3,16 +3,70 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+export async function updateUserTier(userId: string, newTier: number) {
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { type: newTier }
+        });
+        
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error) {
+        console.error("Error al actualizar membresía:", error);
+        return { error: "No se pudo actualizar el nivel de acceso." };
+    }
+}
+
+export async function deleteContent(contentId: string) {
+  try {
+    await prisma.contenido.delete({
+      where: { id: contentId },
+    });
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (error) {
+    return { error: "No se pudo eliminar el bloque de contenido" };
+  }
+}
+
+export async function addContentToProduct(formData: FormData) {
+    const productoId = formData.get('productoId') as string;
+    const titulo = formData.get('titulo') as string;
+    const cuerpo = formData.get('cuerpo') as string;
+    const tipo = formData.get('tipo') as string;
+    const tipoRequerido = parseInt(formData.get('tipoRequerido') as string);
+    const orden = parseInt(formData.get('orden') as string || '0');
+
+    try {
+        await prisma.contenido.create({
+            data: {
+                productoId,
+                titulo,
+                cuerpo,
+                tipo,
+                tipoRequerido,
+                orden
+            }
+        });
+
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error) {
+        console.error("Error al añadir contenido:", error);
+        return { error: "No se pudo añadir el contenido al producto" };
+    }
+}
+
 export async function updateProduct(formData: FormData) {
   const id = formData.get('id') as string;
   const nombre = formData.get('nombre') as string;
   const precio = parseInt(formData.get('precio') as string);
-  const stock = parseInt(formData.get('stock') as string);
   const categoria = formData.get('categoria') as string;
 
   await prisma.producto.update({
     where: { id },
-    data: { nombre, precio, stock, categoria },
+    data: { nombre, precio, categoria },
   });
 
   revalidatePath('/admin');
@@ -30,7 +84,6 @@ export async function deleteProduct(id: string) {
 export async function createProduct(formData: FormData) {
   const nombre = formData.get('nombre') as string;
   const precio = parseInt(formData.get('precio') as string);
-  const stock = parseInt(formData.get('stock') as string);
   const desc = formData.get('desc') as string;
   const categoria = formData.get('categoria') as string;
 
@@ -39,7 +92,6 @@ export async function createProduct(formData: FormData) {
       data: {
         nombre,
         precio,
-        stock,
         desc,
         categoria,
       },

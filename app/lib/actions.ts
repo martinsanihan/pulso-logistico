@@ -14,27 +14,29 @@ import crypto from 'crypto'
 import { signOut } from '@/auth'
 
 export async function authenticate(
-    prevState: String | undefined,
+    prevState: string | undefined,
     formData: FormData
 ) {
-    let userRole: string | null = null;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const user = await prisma.user.findUnique({
+        where: { email: email }
+    });
+
+    if (!user || !user.password) {
+        return "Credenciales Invalidas";
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+        return "Credenciales Invalidas";
+    }
 
     try {
-        await signIn('credentials', formData, { redirect: 'false' });
-
-        const session = await auth();
-        if (!session?.user?.id) return 'Error al obtener sesión.';
-
-        const user = await prisma.user.findUnique({
-            where: { id: session?.user?.id },
-            select: { role: true, email: true, name: true }
-        })
-        if(!user) return 'Usuario no encontrado.'
-
-        userRole = user.role;
-
         await sendMail({
-            to: user?.email as string,
+            to: email,
             subject: 'Nuevo Inicio de Sesión - Pulso Logístico',
             html: `
                 <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -46,25 +48,32 @@ export async function authenticate(
                     <p style="font-size: 12px; color: #666;">Este es un mensaje automático de seguridad.</p>
                 </div>
             `
-        })
+        });
 
-    } catch (error) {
+    } catch (mailError) {
+        console.error("Error al enviar correo de inicio de sesión", mailError);
+    }
+
+    const redirectTo = user.role === 'admin' ?  '/admin' : '/perfil';
+
+    try {
+        await signIn(
+            'credentials', {
+                email,
+                password,
+                redirectTo
+            }
+        );
+    } catch(error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
-                    return error.code === 'credentials' ? 'Credenciales Inválidas' : error.code
+                    return 'Credenciales Invalidas'
                 default:
                     return 'Algo Salió Mal'
             }
         }
-        throw error
-    }
-
-    if (userRole === 'admin') {
-        redirect('/admin');
-    }
-    else if (userRole === 'user') {
-        redirect('/perfil');
+        throw error;
     }
 }
 
@@ -315,4 +324,75 @@ export async function verifyEmailToken(token: string) {
 
 export async function handleSignOut() {
     await signOut({ redirectTo: '/login' });
+}
+
+export async function solicitarCompra(formData: FormData) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Debes iniciar sesión" };
+
+
+    const productoId = formData.get('productoId') as string;
+    const email = formData.get('email') as string;
+    const telefono = formData.get('telefono') as string;
+    const rut = formData.get('rut') as string;
+    const mensaje = formData.get('mensaje') as string;
+
+    try {
+        const producto = await prisma.producto.findUnique({
+            where: { id: productoId }
+        });
+
+        if (!producto) return { error: "Producto no encontrado." };
+
+        await sendMail({
+            to: process.env.EMAIL_USER as string,
+            subject: `Nueva Solicitud de Compra ${producto.nombre}`,
+            html: `
+                <div style="font-family: sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                    <h2 style="color: #1e1b4b;">Nueva Intención de Compra</h2>
+                    <p>El usuario <strong>${session.user.name}</strong> desea adquirir un producto.</p>
+                    <hr />
+                    <p><strong>Producto:</strong> ${producto.nombre}</p>
+                    <p><strong>Precio:</strong> $${producto.precio.toLocaleString('es-CL')}</p>
+                    <p><strong>Datos de Contacto:</strong></p>
+                    <ul>
+                        <li><strong>Email:</strong> ${email}</li>
+                        <li><strong>Teléfono:</strong> ${telefono}</li>
+                        <li><strong>RUT:</strong> ${rut}</li>
+                    </ul>
+                    <p><strong>Mensaje adicional:</strong> ${mensaje || 'Sin mensaje'}</p>
+                </div>
+            `
+        });
+
+        await sendMail({
+            to: email,
+            subject: `Confirmación de Solicitud: ${producto.nombre} - Pulso Logístico`,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px;">
+                    <h1 style="color: #2563eb;">¡Hola ${session.user.name}!</h1>
+                    <p>Hemos recibido correctamente tu solicitud para adquirir <strong>${producto.nombre}</strong>.</p>
+                    <p>Un ejecutivo de nuestro equipo de <strong>Pulso Logístico</strong> se pondrá en contacto contigo a través de los datos proporcionados para concretar el pago y la entrega.</p>
+                    <p>Gracias por preferirnos.</p>
+                </div>
+            `
+        });
+
+        await prisma.compra.create({
+            data: {
+                userId: session.user.id,
+                productoId: producto.id,
+                precioPagado: producto.precio,
+                emailContacto: email,
+                telefono,
+                rut,
+                mensaje
+            }
+        })
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error en la solicitud:", error);
+        return { error: "No se pudo procesar la solicitud, intenta nuevamente." };
+    }
 }

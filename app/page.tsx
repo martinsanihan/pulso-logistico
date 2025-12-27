@@ -10,12 +10,10 @@ export default async function Home() {
   const session = await auth();
   console.log("estado de la sesión", session);
 
-  const productos = await prisma.producto.findMany({
-    take:8
-  });
+  const productos = await prisma.producto.findMany();
   const auspiciadores = await prisma.auspiciador.findMany();
 
-  console.log(productos, auspiciadores)
+  console.log("productos y auspiciadores", productos, auspiciadores)
 
   return (
     <main className="min-h-screen bg-gray-50 pb-20">
@@ -33,11 +31,9 @@ export default async function Home() {
               key={prod.id}
               id={prod.id}
               nombre={prod.nombre}
+              precio={prod.precio}
               descripcion={prod.desc || "sin descripción"}
               categoria={prod.categoria || "sin categoria"}
-              subcategoria={prod.subcategoria || "sin subcategoria"}
-              precio={prod.precio}
-              stock={prod.stock}
             />
           ))}
         </div>

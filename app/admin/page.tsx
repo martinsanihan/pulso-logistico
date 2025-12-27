@@ -32,7 +32,9 @@ export default async function Admin() {
 
     const productos = await prisma.producto.findMany({
         distinct: ['id'],
-        where: { activo: true }
+        where: { activo: true },
+        include: { contenidos: true },
+        orderBy: { createdAt: 'desc' }
     });
 
     console.log("usuarios y productos", users, productos);

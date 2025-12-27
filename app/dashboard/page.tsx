@@ -1,5 +1,6 @@
 import { getHistorialUsuario } from "@/app/lib/data";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const historial = await getHistorialUsuario();
@@ -27,9 +28,12 @@ export default async function DashboardPage() {
                 <span className="text-xs font-bold text-blue-600 uppercase">{c.producto.categoria}</span>
                 <h3 className="text-lg font-bold mt-1">{c.producto.nombre}</h3>
                 <p className="text-sm text-gray-600 line-clamp-2 mt-2">{c.producto.desc}</p>
-                <button className="w-full mt-4 bg-gray-900 text-white py-2 rounded-lg font-medium hover:bg-gray-800 transition">
-                  Acceder al Contenido
-                </button>
+                <Link href={`/producto/contenido?productoId=${c.producto.id}`}>
+                  <button className="w-full mt-4 bg-gray-900 text-white py-2 rounded-lg font-medium hover:bg-gray-800 transition">
+                    Acceder al Contenido
+                  </button>
+                </Link>
+                
               </div>
             ))
           )}

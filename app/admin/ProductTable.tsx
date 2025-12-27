@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from "react";
-import { updateProduct, deleteProduct, createProduct } from "./actions";
+import { updateProduct, deleteProduct, createProduct, deleteContent } from "./actions";
+import ContentManagerModal from "./ContentManagerModla";
 
 export default function ProductTable({ productos }: { productos: any[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedContentProduct, setSelectedContentProduct] = useState<any>(null);
 
   const openEditModal = (producto: any) => {
     setSelectedProduct(producto);
@@ -33,8 +35,6 @@ export default function ProductTable({ productos }: { productos: any[] }) {
               <th className="px-4 py-2 font-medium text-gray-900">Nombre</th>
               <th className="px-4 py-2 font-medium text-gray-900">Precio</th>
               <th className="px-4 py-2 font-medium text-gray-900">Categoria</th>
-              <th className="px-4 py-2 font-medium text-gray-900">Subcategoria</th>
-              <th className="px-4 py-2 font-medium text-gray-900">Stock</th>
               <th className="px-4 py-2 font-medium text-gray-900">Fecha de Creación</th>
             </tr>
           </thead>
@@ -45,8 +45,6 @@ export default function ProductTable({ productos }: { productos: any[] }) {
                 <td className="px-4 py-2 text-gray-700">{producto.nombre || 'Sin nombre'}</td>
                 <td className="px-4 py-2 text-gray-700">${producto.precio?.toLocaleString('es-CL')}</td>
                 <td className="px-4 py-2 text-gray-700">{producto.categoria || 'N/A'}</td>
-                <td className="px-4 py-2 text-gray-700">{producto.subcategoria || 'N/A'}</td>
-                <td className="px-4 py-2 text-gray-700">{producto.stock}</td>
                 <td className="px-4 py-2 text-gray-700">
                   {new Date(producto.createdAt).toLocaleString('es-CL', {
                       day: '2-digit',
@@ -60,6 +58,14 @@ export default function ProductTable({ productos }: { productos: any[] }) {
                     className="text-blue-600 hover:underline font-medium"
                   >
                     Editar
+                  </button>
+                </td>
+                <td className="px-4 py-2 space-x-2">
+                  <button
+                    onClick={() => setSelectedContentProduct(producto)}
+                    className="text-violet-700 font-bold hover:text-violet-900"
+                  >
+                    + Contenido
                   </button>
                 </td>
               </tr>
@@ -93,10 +99,6 @@ export default function ProductTable({ productos }: { productos: any[] }) {
                 <label className="block text-sm font-medium text-gray-700">Precio (CLP)</label>
                 <input name="precio" type="number" placeholder="45000" className="w-full border p-2 rounded-lg mt-1" required />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Stock Inicial</label>
-                <input name="stock" type="number" defaultValue="1" className="w-full border p-2 rounded-lg mt-1" required />
-              </div>
             </div>
 
             <div>
@@ -126,7 +128,7 @@ export default function ProductTable({ productos }: { productos: any[] }) {
     )}
 
       {isModalOpen && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl">
             <h2 className="text-xl font-bold mb-4">Editar Producto</h2>
             
@@ -157,16 +159,45 @@ export default function ProductTable({ productos }: { productos: any[] }) {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500">Stock</label>
-                  <input 
-                    name="stock" 
-                    type="number"
-                    defaultValue={selectedProduct.stock}
-                    className="w-full border p-2 rounded mt-1" 
-                    required
-                  />
-                </div>
+              </div>
+
+              <div className="mt-6 border-t pt-4">
+                <h3 className="text-sm font-bold text-gray-800 mb-3 uppercase tracking-wider">
+                  Bloques de Contenido
+                </h3>
+                
+                {selectedProduct?.contenidos && selectedProduct.contenidos.length > 0 ? (
+                  <ul className="space-y-2">
+                    {selectedProduct.contenidos.map((bloque: any) => (
+                      <li key={bloque.id} className="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-gray-700">{bloque.titulo}</span>
+                          <span className="text-[10px] text-violet-600 font-bold uppercase">Tier {bloque.tipoRequerido}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if(confirm(`¿Estás seguro de eliminar el bloque "${bloque.titulo}"?`)) {
+                              await deleteContent(bloque.id);
+                              closeModal();
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 p-1 transition"
+                          title="Eliminar bloque"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Eliminar Bloque
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-gray-500 italic bg-gray-50 p-3 rounded text-center">
+                    Este producto no tiene bloques de contenido aún.
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-3 pt-4">
@@ -203,6 +234,13 @@ export default function ProductTable({ productos }: { productos: any[] }) {
           </div>
         </div>
       )}
-    </div>
+
+      {selectedContentProduct && (
+        <ContentManagerModal 
+            producto={selectedContentProduct} 
+            onClose={() => setSelectedContentProduct(null)} 
+        />
+    )}
+        </div>
   );
 }

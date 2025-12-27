@@ -3,14 +3,12 @@ import Link from 'next/link';
 interface ProductProps {
     id: string,
     nombre: string,
-    descripcion: string
-    categoria: string,
-    subcategoria: string,
     precio: number,
-    stock: number
+    descripcion: string,
+    categoria: string
 }
 
-export default function ProductCard({ id, nombre, descripcion, categoria, subcategoria, precio, stock }: ProductProps) {
+export default function ProductCard({ id, nombre, precio, descripcion, categoria }: ProductProps) {
     return (
         <div className='border rounded p-4 hover:shadow-lg transition-shadow bg-white border-gray-300'>
             <span className='text-xs uppercase text-black font-bold'>
@@ -36,9 +34,6 @@ export default function ProductCard({ id, nombre, descripcion, categoria, subcat
                     </button>
                 </Link>
             </div>
-            <span className='text-s text-gray-500'>
-                Stock: {stock}
-            </span>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { updateUserStatus, deleteUser } from "@/app/lib/actions";
+import { updateUserTier } from "./actions";
 
 export default function UserTable({ users }: { users: any[] }) {
   return (
@@ -11,6 +12,7 @@ export default function UserTable({ users }: { users: any[] }) {
             <th className="px-4 py-2 font-medium text-gray-900">Nombre</th>
             <th className="px-4 py-2 font-medium text-gray-900">Email</th>
             <th className="px-4 py-2 font-medium text-gray-900">Estado</th>
+            <th className="px-4 py-4 font-medium text-gray-900">Membresía</th>
             <th className="px-4 py-2 font-medium text-gray-900">Acciones</th>
           </tr>
         </thead>
@@ -26,6 +28,21 @@ export default function UserTable({ users }: { users: any[] }) {
                 }`}>
                   {user.status}
                 </span>
+              </td>
+              <td className="px-4 py-2">
+                <select
+                  value={user.type}
+                  onChange={async (e) => {
+                    const newTier = parseInt(e.target.value);
+                    const result = await updateUserTier(user.id, newTier);
+                    if (result.error) alert(result.error);
+                  }}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5"
+                >
+                  <option value={0}>Free</option>
+                  <option value={1}>Tier 1</option>
+                  <option value={2}>Tier 2</option>
+                </select>
               </td>
               <td className="px-4 py-2 space-x-2">
                 {user.status === 'pendiente' ? (

@@ -14,13 +14,28 @@ model Producto {
   precio       Int
   desc         String?
   categoria    String?
-  archivo      String
+  archivo      String   @default("")
   createdAt    DateTime @default(now())
   activo       Boolean  @default(true)
 
   compras Compra[]
+  contenidos Contenido[]
 
   @@map("productos")
+}
+
+model Contenido {
+  id String @id @default(uuid())
+  productoId String
+  titulo String
+  cuerpo String
+  tipo String
+  tipoRequerido Int
+  orden Int
+
+  producto Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+
+  @@map("contenidos_productos")
 }
 
 model Auspiciador {
@@ -35,6 +50,26 @@ model Auspiciador {
   @@map("auspiciadores")
 }
 
+model Compra {
+  id            String   @id @default(uuid())
+  userId        String
+  productoId    String
+  precioPagado  Int
+  createdAt     DateTime @default(now())
+  estado        String   @default("pendiente")
+
+  emailContacto String?
+  telefono      String?
+  rut           String?
+  mensaje       String?
+
+  // Relaciones
+  user     User     @relation(fields: [userId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@map("compras")
+}
+
 model User {
   id            String    @id @default(uuid())
   name          String? // Nombre completo
@@ -45,8 +80,9 @@ model User {
   compras Compra[]
 
   // -- TUS CAMPOS PERSONALIZADOS --
-  password String? // Contraseña encriptada (Opcional por si entra con Google)
+  password String?
   role     String  @default("user") // 'admin' o 'user'
+  type     Int @default(0) // 0 = free, 1 = tier 1, etc...
   status   String  @default("pendiente") // 'pendiente', 'aprobado'
   username String? // Tu campo de usuario personalizado
   // ------------------------------
@@ -88,21 +124,6 @@ model Session {
 
   @@map("sessions")
 }
-
-model Compra {
-  id           String   @id @default(uuid())
-  userId       String
-  productoId   String
-  precioPagado Int
-  createdAt    DateTime @default(now())
-
-  // Relaciones
-  user     User     @relation(fields: [userId], references: [id])
-  producto Producto @relation(fields: [productoId], references: [id])
-
-  @@map("compras")
-}
-
 
 model VerificationToken {
   id      String   @id @default(uuid())

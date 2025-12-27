@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import SolicitarCompraModal from "./solicitarCompraModal";
 
 export const dynamic = 'force-dynamic';
 
@@ -58,24 +59,20 @@ export default async function Producto({ searchParams }: PageProps ) {
                                     ${infoProducto.precio.toLocaleString('es-CL')}
                                 </p>
                             </div>
-                            <div className="text-right">
-                                <p className="text-sm text-gray-500 uppercase font-medium">Disponibilidad</p>
-                                <p className="text-lg font-semibold text-gray-700">
-                                    {infoProducto.stock} unidades
-                                </p>
-                            </div>
                         </div>
 
-                        {/* Botón que conecta con tu lógica de checkout */}
-                        <form action="/api/checkout" method="POST">
-                            <input type="hidden" name="productId" value={infoProducto.id} />
-                            <button 
-                                type="submit"
-                                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-100"
-                            >
-                                Adquirir Reporte
+                        <SolicitarCompraModal 
+                            productoId={infoProducto.id}
+                            nombreProducto={infoProducto.nombre}
+                        />
+
+                        <p className="text-md my-2 text-center text-neutral-500">ó</p>
+
+                        <Link href='/membresías'>
+                            <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-100">
+                                Mejorar Membresía
                             </button>
-                        </form>
+                        </Link>
                         
                         <p className="text-center text-xs text-gray-400 mt-4">
                             Pago seguro procesado por Pulso Logístico. Entrega inmediata tras la confirmación.

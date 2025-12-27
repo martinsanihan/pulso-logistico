@@ -34,35 +34,30 @@ async function main() {
       nombre: 'Barómetro Logístico Q4 2025',
       desc: 'Análisis detallado de costos de transporte y tendencias de fin de año.',
       precio: 45000,
-      stock: 20,
       categoria: 'Reportes'
     },
     {
       nombre: 'Planilla de Optimización de Rutas',
       desc: 'Herramienta en Excel con macros para cálculo de rutas eficientes.',
       precio: 25000,
-      stock: 15,
       categoria: 'Herramientas'
     },
     {
       nombre: 'Informe: Impacto del E-commerce en Bodegaje',
       desc: 'Estudio sobre la demanda de espacios de última milla en Santiago.',
       precio: 32000,
-      stock: 10,
       categoria: 'Reportes'
     },
     {
       nombre: 'Base de Datos: Operadores Logísticos 2025',
       desc: 'Directorio actualizado con más de 200 contactos del sector.',
       precio: 55000,
-      stock: 30,
       categoria: 'Data'
     },
     {
       nombre: 'Guía de Buenas Prácticas: Almacenamiento Frío',
       desc: 'Normativas y estándares para la cadena de frío en Chile.',
       precio: 18000,
-      stock: 18,
       categoria: 'Guías'
     }
   ]
