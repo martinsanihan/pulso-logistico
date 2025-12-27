@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import UserTable from '@/app/admin/UserTable';
 import ProductTable from "@/app/admin/ProductTable";
+import PurchaseTable from "./PurchaseTable";
 
 export default async function Admin() {
     const session = await auth();
@@ -37,6 +38,12 @@ export default async function Admin() {
         orderBy: { createdAt: 'desc' }
     });
 
+    const compras = await prisma.compra.findMany({
+        where: { estado: 'pendiente' },
+        include: { producto: true },
+        orderBy: { createdAt: 'desc' }
+    });
+
     console.log("usuarios y productos", users, productos);
 
     return (
@@ -46,6 +53,9 @@ export default async function Admin() {
 
             <h1 className="text-2xl font-bold mb-6">Gestión de Productos</h1>
             <ProductTable productos={productos} />
+            
+            <h1 className="text-2xl font-bold mb-6">Compras Pendientes</h1>
+            <PurchaseTable compras={compras}/>
         </div>
         
     );

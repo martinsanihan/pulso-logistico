@@ -3,6 +3,21 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+export async function updatePurchaseStatus(purchaseId: string, newStatus: string) {
+    try {
+        await prisma.compra.update({
+            where: { id: purchaseId },
+            data: { estado: newStatus }
+        });
+        
+        revalidatePath('/admin');
+        return { success: true };
+    } catch (error) {
+        console.error("Error al actualizar compra:", error);
+        return { error: "No se pudo actualizar el estado de la compra." };
+    }
+}
+
 export async function updateUserTier(userId: string, newTier: number) {
     try {
         await prisma.user.update({

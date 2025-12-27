@@ -66,8 +66,8 @@ export default async function DashboardPage() {
                     ${c.precioPagado.toLocaleString('es-CL')}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                      Completado
+                    <span className={`px-3 py-1 text-xs font-medium ${c.estado === 'pendiente' ? 'bg-amber-50 text-amber-400' : 'bg-green-100 text-green-700'} rounded-full`}>
+                      {c.estado === 'pendiente' ? 'Pendiente' : 'Completado'}
                     </span>
                   </td>
                 </tr>
