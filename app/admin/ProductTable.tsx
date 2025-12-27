@@ -110,6 +110,11 @@ export default function ProductTable({ productos }: { productos: any[] }) {
               </select>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Subir Archivo</label>
+              <input name="file" className="w-full border p-2 rounded-lg mt-1 text-xs" type="file"></input>
+            </div>
+
             <div className="flex gap-3 pt-6">
               <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">
                 Crear Producto
@@ -159,6 +164,20 @@ export default function ProductTable({ productos }: { productos: any[] }) {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500">Actualizar Archivo (Opcional)</label>
+                <input 
+                  name="file" 
+                  type="file"
+                  className="w-full border p-2 rounded mt-1 text-xs"
+                />
+                {selectedProduct.archivo && (
+                  <p className="text-[10px] text-gray-400 mt-1 italic">
+                    Archivo actual: {selectedProduct.archivo}
+                  </p>
+                )}
               </div>
 
               <div className="mt-6 border-t pt-4">

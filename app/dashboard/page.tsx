@@ -33,6 +33,16 @@ export default async function DashboardPage() {
                     Acceder al Contenido
                   </button>
                 </Link>
+
+                {c.producto.archivo && (
+                  <a
+                    href={`/uploads/productos/${c.producto.archivo}`}
+                    download
+                    className="block w-full mt-2 bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition text-center"
+                  >
+                    Descargar {c.producto.archivo.split('.').pop()?.toUpperCase()}
+                  </a>
+                )}
                 
               </div>
             ))

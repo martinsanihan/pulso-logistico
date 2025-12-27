@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function updatePurchaseStatus(purchaseId: string, newStatus: string) {
     try {
@@ -78,13 +80,46 @@ export async function updateProduct(formData: FormData) {
   const nombre = formData.get('nombre') as string;
   const precio = parseInt(formData.get('precio') as string);
   const categoria = formData.get('categoria') as string;
+  const file = formData.get('file') as File;
 
-  await prisma.producto.update({
-    where: { id },
-    data: { nombre, precio, categoria },
-  });
+  try {
+    const productoActual = await prisma.producto.findUnique({
+        where: { id },
+        select: { archivo: true }
+    });
+    let fileName = '';
+    if (file && file.size > 0) {
+      fileName = `${Date.now()}-${file.name}`;
+      const uploadDir = path.join(process.cwd(), 'public/uploads/productos')
+      const filePath = path.join(process.cwd(), 'public/uploads/productos', fileName);
+      const buffer = Buffer.from(await file.arrayBuffer());
+      await fs.writeFile(filePath, buffer);
 
-  revalidatePath('/admin');
+      
+
+      if (productoActual?.archivo) {
+        const oldPath = path.join(uploadDir, productoActual.archivo);
+        try {
+          await fs.access(oldPath);
+          await fs.unlink(oldPath);
+          console.log(`Archivo anterior eliminado: ${productoActual.archivo}`);
+        } catch (error) {
+          console.error("No se puede borrar el archivo.", error);
+        }
+      }
+    }
+
+    await prisma.producto.update({
+      where: { id },
+      data: { nombre, precio, categoria, archivo: fileName },
+    });
+
+    revalidatePath('/admin');
+    return { success: true };
+  } catch(error) {
+    console.error("error al actualizar el producto", error);
+    return { error: "no se pudo actualizar el producto" };
+  }
 }
 
 export async function deleteProduct(id: string) {
@@ -101,6 +136,15 @@ export async function createProduct(formData: FormData) {
   const precio = parseInt(formData.get('precio') as string);
   const desc = formData.get('desc') as string;
   const categoria = formData.get('categoria') as string;
+  const file = formData.get('file') as File;
+
+  let fileName = '';
+  if (file && file.size > 0) {
+    fileName = `${Date.now()}-${file.name}`;
+    const filePath = path.join(process.cwd(), 'public/uploads/productos', fileName);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, buffer);
+  }
 
   try {
     await prisma.producto.create({
@@ -109,6 +153,7 @@ export async function createProduct(formData: FormData) {
         precio,
         desc,
         categoria,
+        archivo: fileName
       },
     });
 
