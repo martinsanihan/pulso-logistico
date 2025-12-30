@@ -16,12 +16,38 @@ export async function getHistorialUsuario() {
         }
     });
 
-    const productos = await prisma.compra.findMany({
-        where: { userId: session.user.id },
+    const productosAdquiridos = await prisma.compra.findMany({
+        where: { userId: session.user.id, estado: 'completado' },
         include: { producto: true },
         orderBy: { createdAt: 'desc' },
         distinct: ['productoId']
     });
 
-    return { productos: productos, compras: compras };
+    const usuario = await prisma.user.findUnique({
+        where: { id: session.user.id }
+    });
+
+    if(!usuario) return null;
+
+    const tier = usuario?.type;
+
+    const contenidoAccesible = await prisma.producto.findMany({
+        where: {
+            activo: true,
+            contenidos: {
+                some: {
+                    tipoRequerido: {lte: tier}
+                }
+            }
+        },
+        include: {
+            contenidos: {
+                where: { tipoRequerido: { lte: tier } },
+                orderBy: { orden: 'asc' }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+
+    return { productos: productosAdquiridos, compras: compras, usuario: usuario, productosMembresia: contenidoAccesible };
 }

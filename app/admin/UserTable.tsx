@@ -1,7 +1,7 @@
 'use client';
 
 import { updateUserStatus, deleteUser } from "@/app/lib/actions";
-import { updateUserTier } from "./actions";
+import { switchRole, updateUserTier } from "./actions";
 
 export default function UserTable({ users }: { users: any[] }) {
   return (
@@ -12,6 +12,7 @@ export default function UserTable({ users }: { users: any[] }) {
             <th className="px-4 py-2 font-medium text-gray-900">Nombre</th>
             <th className="px-4 py-2 font-medium text-gray-900">Email</th>
             <th className="px-4 py-2 font-medium text-gray-900">Estado</th>
+            <th className="px-4 py-2 font-medium text-gray-900">Rol</th>
             <th className="px-4 py-4 font-medium text-gray-900">Membresía</th>
             <th className="px-4 py-2 font-medium text-gray-900">Acciones</th>
           </tr>
@@ -28,6 +29,9 @@ export default function UserTable({ users }: { users: any[] }) {
                 }`}>
                   {user.status}
                 </span>
+              </td>
+              <td className="px-4 py-2 text-gray-700">
+                {user.role}
               </td>
               <td className="px-4 py-2">
                 <select
@@ -61,17 +65,48 @@ export default function UserTable({ users }: { users: any[] }) {
                   </button>
                 )}
 
-                <button
+                {user.role !== 'admin' && (
+                  <button
                     onClick={async () => {
                     if (confirm(`¿Estás seguro de que deseas eliminar a ${user.email}? Esta acción no se puede deshacer.`)) {
-                        const result = await deleteUser(user.id);
-                        if (result?.error) alert(result.error);
+                      const result = await deleteUser(user.id);
+                      if (result?.error) alert(result.error);
                     }
                     }}
                     className="rounded bg-red-100 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-200"
-                >
+                  >
                     Eliminar
-                </button>
+                  </button>
+                )}
+
+                {user.role === 'admin' ? (
+                  <button
+                    onClick={async () => {
+                      if (confirm(`Confirmar cambio de rol al admin ${user.name}`)) {
+                        const result = await switchRole(user.id, 'user');
+                        if (result?.error) alert(result.error);
+                      }
+                    }}
+                    className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-200"
+                  >
+                    Cambiar a usuario
+                  </button>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      if (confirm(`Confirmar cambio de rol al usuario ${user.name}`)) {
+                        const result = await switchRole(user.id, 'admin');
+                        if (result?.error) alert(result.error);
+                      }
+                    }}
+                    className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-200"
+                  >
+                    Cambiar a admin
+                  </button>
+                )
+
+                }
+                
               </td>
             </tr>
           ))}

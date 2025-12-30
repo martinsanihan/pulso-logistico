@@ -93,21 +93,24 @@ async function main() {
         userId: userAdmin.id,
         productoId: allProducts[0].id,
         precioPagado: allProducts[0].precio,
-        estado: 'pendiente'
+        estado: 'pendiente',
+        emailContacto: 'ihansanmartin.m@gmail.com'
       },
       {
         id: 'eeff762e-9363-4093-825a-e51e30de85a8',
         userId: userAdmin.id,
         productoId: allProducts[1].id,
         precioPagado: allProducts[1].precio,
-        estado: 'pendiente'
+        estado: 'pendiente',
+        emailContacto: 'ihansanmartin.m@gmail.com'
       },
       {
         id: '5d69dfda-5e39-4b90-9077-8c74a5b53841',
         userId: userAdmin.id,
         productoId: allProducts[3].id,
         precioPagado: allProducts[3].precio,
-        estado: 'completado'
+        estado: 'completado',
+        emailContacto: 'ihansanmartin.m@gmail.com'
       }
     ];
 

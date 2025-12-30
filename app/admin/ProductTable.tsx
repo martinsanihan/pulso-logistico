@@ -104,7 +104,7 @@ export default function ProductTable({ productos, categorias }: { productos: any
 
               <div>
                 <label className="block text-xs font-medium text-gray-500">Categoría</label>
-                <select className="w-full border p-2 rounded mt-1">
+                <select name="categoria" className="w-full border p-2 rounded mt-1">
                   {categorias.map((cat) => (
                     <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                   ))}
@@ -126,7 +126,7 @@ export default function ProductTable({ productos, categorias }: { productos: any
             <div>
               <label className="block text-xs font-medium text-gray-500">Descripción</label>
               <textarea
-                name="descripcion"
+                name="desc"
                 placeholder='Descripción del Producto'
                 className="w-full border p-2 rounded mt-1"
                 required

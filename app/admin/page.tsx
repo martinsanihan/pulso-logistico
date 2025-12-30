@@ -24,7 +24,6 @@ export default async function Admin() {
     const users = await prisma.user.findMany({
         where: {
             AND: [
-                { NOT: { id: session?.user?.id } },
                 { NOT: { status: 'removed' } }
             ]
         },

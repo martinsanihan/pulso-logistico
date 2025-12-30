@@ -42,7 +42,7 @@ export default function PurchaseTable({ compras }: { compras: any[] }) {
                   <button
                     onClick={async () => {
                       if(confirm("¿Confirmas que recibiste el pago para este reporte?")) {
-                        await updatePurchaseStatus(compra.id, 'completada');
+                        await updatePurchaseStatus(compra.id, 'completado');
                       }
                     }}
                     className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700 transition"

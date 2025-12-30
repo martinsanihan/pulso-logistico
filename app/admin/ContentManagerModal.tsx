@@ -82,6 +82,28 @@ export default function ContentManagerModal({ producto, onClose }: any) {
                                     <option value="2">Suscripción 2 (Premium)</option>
                                 </select>
                             </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tipo</label>
+                                <select 
+                                    name="tipo" 
+                                    key={`tipo-${editingBlock?.id || 'new'}`}
+                                    defaultValue={editingBlock?.tipo || "Parrafo"} 
+                                    className="w-full bg-slate-50 border-slate-200 rounded-xl p-3.5 border outline-none"
+                                >
+                                    <option value="Parrafo">Parrafo</option>
+                                    <option value="Visualización">Visualización</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Órden</label>
+                                <input 
+                                    name="orden" 
+                                    key={`ord-${editingBlock?.id || 'new'}`}
+                                    defaultValue={editingBlock?.orden || "0"} 
+                                    className="w-full bg-slate-50 border-slate-200 rounded-xl p-3.5 border outline-none focus:ring-2 focus:ring-accent-blue/10 transition-all font-medium" 
+                                    required 
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-1.5">

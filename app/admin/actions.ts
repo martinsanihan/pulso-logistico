@@ -4,16 +4,61 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import fs from 'fs/promises';
 import path from 'path';
+import { sendMail } from "../lib/mail";
 
 export async function updatePurchaseStatus(purchaseId: string, newStatus: string) {
     try {
-        await prisma.compra.update({
-            where: { id: purchaseId },
-            data: { estado: newStatus }
-        });
-        
-        revalidatePath('/admin');
-        return { success: true };
+      const compra = await prisma.compra.findUnique({
+        where: { id: purchaseId },
+        select: { userId: true, productoId: true }
+      });
+
+      const comprador = await prisma.user.findUnique({
+        where: { id: compra?.userId },
+        select: { email: true }
+      });
+
+      const productoComprado = await prisma.producto.findUnique({
+        where: { id: compra?.productoId },
+        select: { nombre: true }
+      });
+
+      await prisma.compra.update({
+          where: { id: purchaseId },
+          data: { estado: newStatus }
+      });
+
+      sendMail({
+        to: `${comprador?.email}`,
+        subject: `Tu pago por la compra de ${productoComprado?.nombre} ha sido aprobado! - Pulso Logístico`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h1 style="color: #2563eb;">Su compra ha sido aprobada por un administrador!</h1>
+            <p>Producto: ${productoComprado?.nombre}</p>
+            <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #666;">Este es un mensaje automático.</p>
+          </div>
+        `
+      });
+
+      sendMail({
+        to: `${process.env.EMAIL_USER}`,
+        subject: `La compra del usuario ${comprador?.email} ha sido aprobada`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h1 style="color: #2563eb;">Una compra ha sido confirmada y aprobada por un admin</h1>
+            <p>Producto: ${productoComprado?.nombre}</p>
+            <p>Usuario: ${comprador?.email}</p>
+            <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #666;">Este es un mensaje automático.</p>
+          </div>
+        `
+      });
+      
+      revalidatePath('/admin');
+      return { success: true };
     } catch (error) {
         console.error("Error al actualizar compra:", error);
         return { error: "No se pudo actualizar el estado de la compra." };
@@ -103,7 +148,7 @@ export async function updateProduct(formData: FormData) {
   const id = formData.get('id') as string;
   const nombre = formData.get('nombre') as string;
   const precio = parseInt(formData.get('precio') as string);
-  const descripcion = formData.get('descripción') as string;
+  const desc = formData.get('descripcion') as string;
   const categoria = formData.get('categoria') as string;
   const file = formData.get('file') as File;
 
@@ -116,7 +161,7 @@ export async function updateProduct(formData: FormData) {
     const dataToUpdate: any = {
       nombre,
       precio,
-      descripcion,
+      desc,
       categoria
     }
 
@@ -194,4 +239,37 @@ export async function createProduct(formData: FormData) {
   } catch (error) {
     return { error: "No se pudo crear el producto" };
   }
+}
+
+export async function switchRole(userId: string, newRole: string) {
+
+  try {
+    const usuario = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: newRole
+      },
+      select: { email: true }
+    });
+
+    sendMail({
+      to: `${usuario.email}`,
+      subject: `Su rol ha sido cambiado a ${newRole} - Pulso Logístico`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h1 style="color: #2563eb;">Su rol ha sido cambiado en la plataforma</h1>
+          <p>Tu nuevo rol es ${newRole}</p>
+          <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-CL')}</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #666;">Este es un mensaje automático.</p>
+        </div>
+      `
+    })
+
+    revalidatePath('/admin');
+    return { success: true };
+  } catch(error) {
+    console.error("no se pudo cambiar rol de usuario", error)
+    return { error: "no se pudo cambiar rol de usuario" }
+  }   
 }
