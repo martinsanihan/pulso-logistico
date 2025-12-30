@@ -44,7 +44,7 @@ export default async function Admin() {
         orderBy: { createdAt: 'desc' }
     });
 
-    console.log("usuarios y productos", users, productos);
+    const categorias = await prisma.categoria.findMany();
 
     return (
         <div className="p-8 space-y-10">
@@ -52,7 +52,7 @@ export default async function Admin() {
             <UserTable users={users} />
 
             <h1 className="text-2xl font-bold mb-6">Gestión de Productos</h1>
-            <ProductTable productos={productos} />
+            <ProductTable productos={productos} categorias={categorias}/>
             
             <h1 className="text-2xl font-bold mb-6">Compras Pendientes</h1>
             <PurchaseTable compras={compras}/>

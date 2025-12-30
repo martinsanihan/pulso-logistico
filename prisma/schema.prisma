@@ -8,6 +8,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Categoria {
+  id      String  @id @default(uuid())
+  nombre  String  @unique
+  desc    String?
+
+  @@map("categorias")
+}
+
 model Producto {
   id           String   @id @default(uuid())
   nombre       String
@@ -44,7 +52,7 @@ model Auspiciador {
   logo      String?
   tipo      String?
   desc      String?
-  web       String?
+  web       String?  @unique
   createdAt DateTime @default(now())
 
   @@map("auspiciadores")

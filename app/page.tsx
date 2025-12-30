@@ -10,7 +10,9 @@ export default async function Home() {
   const session = await auth();
   console.log("estado de la sesión", session);
 
-  const productos = await prisma.producto.findMany();
+  const productos = await prisma.producto.findMany({
+    where: { activo: true }
+  });
   const auspiciadores = await prisma.auspiciador.findMany();
 
   console.log("productos y auspiciadores", productos, auspiciadores)
@@ -34,6 +36,7 @@ export default async function Home() {
               precio={prod.precio}
               descripcion={prod.desc || "sin descripción"}
               categoria={prod.categoria || "sin categoria"}
+              archivo={prod.archivo}
             />
           ))}
         </div>
@@ -54,8 +57,8 @@ export default async function Home() {
       <div className="flex flex-wrap justify-center gap-12 grayscale hover:grayscale-0 transition-all duration-500 mt-10 items-center">
         {auspiciadores.map((ausp) => (
           <div key={ausp.id} className="relative h-16 w-32 flex items-center justify-between p-2">
-            {ausp.logo ? (
-              <Link href={`https://${ausp.web}` || 'https://www.google.com'} className="relative h-16 w-32">
+            {ausp.logo && ausp.web ? (
+              <Link href={!ausp.web.includes('https://') ? `https://${ausp.web}` : `${ausp.web}`} className="relative h-16 w-32">
                 <img
                   src={ausp.logo}
                   alt={ausp.nombre}

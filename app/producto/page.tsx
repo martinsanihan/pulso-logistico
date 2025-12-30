@@ -23,6 +23,8 @@ export default async function Producto({ searchParams }: PageProps ) {
         return "producto no encontrado";
     }
 
+    const extension = infoProducto.archivo?.split('.').pop()?.toLowerCase();
+
     return (
         <div className="max-w-4xl mx-auto p-6 lg:p-12">
             <Link 
@@ -34,8 +36,8 @@ export default async function Producto({ searchParams }: PageProps ) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
                 {/* Columna Izquierda: Imagen/Vista Previa */}
-                <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center border border-gray-100">
-                    <span className="text-gray-400 text-6xl">📊</span>
+                <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center border border-gray-100 p-5">
+                    <img src={extension === 'csv' || extension === 'pdf' ? `${extension}.svg` : 'nofile.svg'} width='150px' alt={extension} className="mx-auto"></img>
                 </div>
 
                 {/* Columna Derecha: Información y Compra */}

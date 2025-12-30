@@ -75,10 +75,35 @@ export async function addContentToProduct(formData: FormData) {
     }
 }
 
+export async function updateContent(formData: FormData) {
+  const id = formData.get('id') as string;
+  const titulo = formData.get('titulo') as string;
+  const cuerpo = formData.get('cuerpo') as string;
+  const tipo = formData.get('tipo') as string;
+  const tipoRequerido = parseInt(formData.get('tipoRequerido') as string);
+  const orden = parseInt(formData.get('orden') as string);
+
+  try {
+    await prisma.contenido.update({
+      where: { id: id },
+      data: {
+        titulo, cuerpo, tipo, tipoRequerido, orden
+      }
+    });
+
+    revalidatePath('/admin');
+    return { success: true };
+  } catch(error) {
+    console.error(error);
+    return { error: "No se pudo actualizar el bloque" };
+  }
+}
+
 export async function updateProduct(formData: FormData) {
   const id = formData.get('id') as string;
   const nombre = formData.get('nombre') as string;
   const precio = parseInt(formData.get('precio') as string);
+  const descripcion = formData.get('descripción') as string;
   const categoria = formData.get('categoria') as string;
   const file = formData.get('file') as File;
 
@@ -87,15 +112,22 @@ export async function updateProduct(formData: FormData) {
         where: { id },
         select: { archivo: true }
     });
-    let fileName = '';
+
+    const dataToUpdate: any = {
+      nombre,
+      precio,
+      descripcion,
+      categoria
+    }
+
     if (file && file.size > 0) {
-      fileName = `${Date.now()}-${file.name}`;
+      const fileName = `${Date.now()}-${file.name}`;
       const uploadDir = path.join(process.cwd(), 'public/uploads/productos')
       const filePath = path.join(process.cwd(), 'public/uploads/productos', fileName);
       const buffer = Buffer.from(await file.arrayBuffer());
       await fs.writeFile(filePath, buffer);
 
-      
+      dataToUpdate.archivo = fileName;
 
       if (productoActual?.archivo) {
         const oldPath = path.join(uploadDir, productoActual.archivo);
@@ -111,7 +143,7 @@ export async function updateProduct(formData: FormData) {
 
     await prisma.producto.update({
       where: { id },
-      data: { nombre, precio, categoria, archivo: fileName },
+      data: dataToUpdate,
     });
 
     revalidatePath('/admin');

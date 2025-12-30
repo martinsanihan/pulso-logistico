@@ -1,14 +1,19 @@
 import Link from 'next/link';
+import { size } from 'zod/v4';
 
 interface ProductProps {
     id: string,
     nombre: string,
     precio: number,
     descripcion: string,
-    categoria: string
+    categoria: string,
+    archivo: string
 }
 
-export default function ProductCard({ id, nombre, precio, descripcion, categoria }: ProductProps) {
+export default function ProductCard({ id, nombre, precio, descripcion, categoria, archivo }: ProductProps) {
+    const extension = archivo?.split('.').pop()?.toLowerCase();
+
+
     return (
         <div className='border rounded p-4 hover:shadow-lg transition-shadow bg-white border-gray-300'>
             <span className='text-xs uppercase text-black font-bold'>
@@ -18,10 +23,8 @@ export default function ProductCard({ id, nombre, precio, descripcion, categoria
                 {nombre}
             </h3>
 
-            <div className='aspect-square bg-gray-200 mt-4 mb-4 text-center py-20'>
-                <span className='text-zinc-500'>
-                    Vista Previa
-                </span>
+            <div className='aspect-square bg-gray-100 mt-4 mb-4 text-center py-25 items-center'>
+                <img src={extension === 'pdf' || extension === 'csv' ? `${extension}.svg` : 'nofile.svg'} width='150px' alt={extension} className='mx-auto'></img>
             </div>
             
             <div className='flex justify-between items-center'>

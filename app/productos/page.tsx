@@ -3,7 +3,9 @@ import Image from "next/image";
 import ProductCard from "../components/ProductCard";
 
 export default async function ProductosPage() {
-  const productos = await prisma.producto.findMany();
+  const productos = await prisma.producto.findMany({
+    where: { activo: true }
+  });
 
   return (
     <div className="max-w-7xl mx-auto p-8">
@@ -23,6 +25,7 @@ export default async function ProductosPage() {
             descripcion={producto.desc || "sin descripción"}
             categoria={producto.categoria || "sin categoria"}
             precio={producto.precio}
+            archivo={producto.archivo}
           />
         ))}
       </div>
