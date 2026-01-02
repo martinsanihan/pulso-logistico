@@ -19,34 +19,38 @@ Para poder ejecutar esta aplicación localmente se debe estar en un entorno UNIX
 
 ## Configuración de Gmail (OAuth2.0)
 
-Para que el sistema pueda enviar correos, debes configurar el acceso programático en [Google Cloude Console](https://console.cloud.google.com/).
+Para que el sistema pueda enviar correos, debes configurar el acceso programático en [Google Cloud Console](https://console.cloud.google.com/).
 
 1. **Habilitar API**:
 
 - Crea un nuevo proyecto
-- Ir a **APIs & Services > Library** y buscar **Gmail API**, luego hacer clic en **enable**.
+- Ir al menú lateral **APIs & Services > Library** y buscar **Gmail API**, luego hacer clic en **enable**.
 
 2. **Configurar pantalla de consentimiento (OAuth Consent Screen)**:
 
-- Ir a OAuth Consent Screen.
+- Ir al menú lateral **APIs & Services > OAuth Consent Screen**.
+![Mensaje para comenzar Set Up](public/readme1.png)
+- Aparecerá este mensaje y cliquear en **Comenzar**
+- Completar información de la App y **siguiente**.
 - User Type: Seleccionar **External** o **Internal** en caso de usar Google Workspace coorporativo.
-- En **Scopes**, añadir: `https://www.googleapis.com/auth/gmail.send`
-- **Importante**: Añadir tu correo a la lista de Test Users
+- Completar información de contacto y finalizar.
+<!-- - En **Scopes**, añadir: `https://www.googleapis.com/auth/gmail.send` -->
+- Ir a **Publico** en el panel lateral y en **Test Users** ingresar el correo electrónico que se usará para desarrollar la app.
 
 3. **Crear Credenciales**:
 
-- Ir a Credentials > Create Credentials > OAuth Client ID
+- Ir a **APIs & Services > Credentials > Create Credentials > OAuth Client ID**
 - **Application Type**: Web Application
 - **Authorized JavaScript Origins**: `http://localhost:3000`
 - **Authorized redirect URIs**: `https://developers.google.com/oauthplayground` (Necesario para obtener Token inicial)
--  **Obtener Credenciales**: Una vez creado, copiar **Client ID** y **Client Secret**
+-  **Obtener Credenciales**: Una vez creado, copiar **Client ID** y **Client Secret** y guardarlos para los pasos posteriores.
 
 4. Obtener el  Refresh Token
 - Ir a [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/)
 - Hacer clic en el ícono de configuración y marcar "**User your own OAuth credentials**" e ingresar Client ID y Secret
 - En la sección **Select & Authorize APIs** insertar la URL https://www.googleapis.com/auth/gmail.send en el campo "**Insert your own scopes**"
 - Loguearse con Google y otorgar permisos a la API
-- En la sección "**Exchange authorization code for tokens**" hacer clic en el botón con el mismo texto y copiar valor de **Refresh Token** y **Access Token**
+- En la sección "**Exchange authorization code for tokens**" hacer clic en el botón con el mismo nombre copiar y guardar valor de **Refresh Token** y **Access Token**
 
 ## Ejecución/Compilación
 
@@ -69,7 +73,7 @@ AUTH_SECRET=secreto_seguro # Se puede generar con: openssl rand -base64 32
 AUTH_URL=http://localhost:3000
 
 # Base de Datos (Docker)
-DATABASE_URL="postgresql://user:password@localhost:5432/pulso_db"
+DATABASE_URL="postgresql://ihan_clogis:contraseñaultrasegura@localhost:5432/pulso_logis_db"
 
 ```
 
