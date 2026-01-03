@@ -31,7 +31,7 @@ export const sendMail = async ({ to, subject, html }: { to: string, subject: str
         } as any);
 
         const mailOptions = {
-            form: `Pulso Logístico <${process.env.EMAIL_USER}>`,
+            from: `Pulso Logístico <${process.env.EMAIL_USER}>`,
             to,
             subject,
             html
