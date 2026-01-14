@@ -48,7 +48,7 @@ Para que el sistema pueda enviar correos, debes configurar el acceso programáti
 4. Obtener el  Refresh Token
 - Ir a [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/)
 - Hacer clic en el ícono de configuración y marcar "**User your own OAuth credentials**" e ingresar Client ID y Secret
-- En la sección **Select & Authorize APIs** insertar la URL https://www.googleapis.com/auth/gmail.send en el campo "**Insert your own scopes**"
+- En la sección **Select & Authorize APIs** insertar la URL https://mail.google.com/  en el campo "**Insert your own scopes**", o en su defecto buscar en la lista de scopes "**Gmail API v1**" y seleccionar la misma URL.
 - Loguearse con Google y otorgar permisos a la API
 - En la sección "**Exchange authorization code for tokens**" hacer clic en el botón con el mismo nombre copiar y guardar valor de **Refresh Token** y **Access Token**
 
@@ -76,6 +76,8 @@ AUTH_URL=http://localhost:3000
 DATABASE_URL="postgresql://ihan_clogis:contraseñaultrasegura@localhost:5432/pulso_logis_db"
 
 ```
+
+Se debe asegurar que cada vez que se modifica el archivo .env, hay que bajar los contenedores y volver a crearlos con `sudo docker compose down` y `sudo docker compose up -d` 
 
 Para levantar los contenedores se debe ejecutar en la terminal los siguientes comandos (dentro del directorio del repositorio).
 
